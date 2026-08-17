@@ -1,0 +1,395 @@
+{
+  "name": "Agente Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "ff594532-1758-4aae-86a8-e1863eca8b0e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0e763e91-f725-4adf-842f-90c298de94cc",
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Áudio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -736,
+        160
+      ],
+      "id": "7a97dddd-c59d-4624-ba54-0cc48bc4ef74",
+      "name": "Identifica se é texto ou áudio"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -496,
+        336
+      ],
+      "id": "c15525a5-8a89-47b4-833d-3bfad8502362",
+      "name": "Busca o arquivo de áudio",
+      "webhookId": "fb258d50-27a7-4830-9bf9-f2b2330f1002",
+      "credentials": {
+        "telegramApi": {
+          "id": "yeIOc6LEpky9COfg",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.5-flash"
+        },
+        "inputType": "binary",
+        "simplify": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -272,
+        336
+      ],
+      "id": "620a1f78-5cca-4c3c-acfd-c48045120410",
+      "name": "Transcreve o áudio",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "o9aB0OquaWi74Dso",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "547efdf2-c0b7-4b61-bc55-d50122200849",
+              "name": "MensagemChat",
+              "value": "={{ $json.candidates[0].content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -48,
+        336
+      ],
+      "id": "0341276f-52a9-4c31-8e95-472df3f916f9",
+      "name": "Guarda a menssagem transcrita"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0d4dee5d-c0c9-43c2-b38d-b613acf1d6bf",
+              "name": "MensagemChat",
+              "value": "={{ $('Recebe mensagem Telegram').item.json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "e46cb621-fd10-473f-99a8-07feffd587d4",
+      "name": "Guarda  a menssagem de texto"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        416
+      ],
+      "id": "dd5c8a9d-0e74-4b58-b12b-dbce3052d633",
+      "name": "Google Gemini",
+      "notesInFlow": false,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "o9aB0OquaWi74Dso",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -944,
+        160
+      ],
+      "id": "58014f61-3d44-4a43-b759-1df5727846f9",
+      "name": "Recebe mensagem Telegram",
+      "webhookId": "29d72c0a-26eb-40d0-ac37-c66d759cfb66",
+      "credentials": {
+        "telegramApi": {
+          "id": "yeIOc6LEpky9COfg",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Recebe mensagem Telegram').item.json.message.chat.id }}",
+        "contextWindowLength": 30
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        336,
+        416
+      ],
+      "id": "7a17bbde-9925-47f2-9117-55a3067180c5",
+      "name": "Banco de dados"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.MensagemChat }}",
+        "options": {
+          "systemMessage": "Contexto e Persona:\nVocê é o assistente virtual de atendimento ao cliente da loja \"TechByte Eletrônicos\". Sua personalidade é altamente profissional, educada, prestativa e objetiva. Você atua como um consultor de vendas de tecnologia.\n\nRegra de Apresentação (MUITO IMPORTANTE):\nSempre que receber uma saudação inicial (Oi, Olá, Bom dia, etc.) e a pessoa não disser o nome, você DEVE se apresentar e pedir o nome do cliente antes de prosseguir. Exemplo: \"Olá! Sou o assistente virtual da TechByte Eletrônicos. Como posso ajudar você hoje? Por favor, me informe o seu nome para continuarmos o atendimento.\" Trate o cliente pelo nome nas mensagens seguintes.\n\nCatálogo de Produtos (Base de Conhecimento):\nVocê só trabalha com os 10 produtos listados abaixo. Não invente outros produtos.\n\nTeclado Mecânico Gamer RGB - R$ 349,90\n\nMouse Gamer Ergonômico com LED - R$ 189,00\n\nMousepad Gigante com LED RGB - R$ 120,00\n\nRoteador Wi-Fi 6 de Longo Alcance - R$ 549,00\n\nSmart TV 50 Polegadas 4K - R$ 2.399,00\n\nConsole Portátil Multiplayer 64GB - R$ 2.199,00\n\nSmartphone Galaxy S20 (128GB) - R$ 1.599,00\n\nHeadset Gamer com Cancelamento de Ruído - R$ 299,90\n\nSSD NVMe 1TB M.2 Alto Desempenho - R$ 450,00\n\nKit Placa de Captura e Webcam Full HD - R$ 890,00\n\nRegras de Frete e Envio:\nSe o cliente perguntar sobre entregas, frete ou prazos, informe que todos os nossos envios são realizados com total segurança através dos Correios. O valor exato do frete e o tempo de entrega dependem da localidade (CEP) do cliente.\n\nRegras de Pagamento:\nInforme que oferecemos as seguintes facilidades de pagamento:\n\nCartão de Crédito em até 10x SEM JUROS.\n\nPix (com aprovação imediata).\n\nBoleto Bancário.\n\nComo Comprar (Finalização):\nQuando o cliente decidir qual produto deseja levar, explique que você vai enviar o link seguro para finalização no site. Envie o link fictício usando o formato padrão da loja, substituindo a parte final pelo nome do produto escolhido.\nExemplo de link que você deve gerar: [www.techbyteeletronicos.com.br/comprar/nome-do-produto]\n\nDiretrizes de Comunicação:\n\nMantenha respostas curtas e divididas em pequenos parágrafos, ideais para leitura rápida no Telegram.\n\nSeja sempre muito educado.\n\nNunca exiba a lista de produtos inteira a menos que o cliente peça para ver as opções ou o catálogo."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        192,
+        160
+      ],
+      "id": "110e9e14-589f-46a6-b4ad-2bce81a910ef",
+      "name": "Agente IA",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "notes": "Se houver erro no servidor Google ele tenta mais 3 vezes."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Recebe mensagem Telegram').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        544,
+        160
+      ],
+      "id": "3ae38e59-f862-436c-9396-92c2f59668ac",
+      "name": "Responde a mensagem Telegram",
+      "webhookId": "aa8d8852-5185-4bb3-85b3-7caf549756f7",
+      "credentials": {
+        "telegramApi": {
+          "id": "yeIOc6LEpky9COfg",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Identifica se é texto ou áudio": {
+      "main": [
+        [
+          {
+            "node": "Guarda  a menssagem de texto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Busca o arquivo de áudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca o arquivo de áudio": {
+      "main": [
+        [
+          {
+            "node": "Transcreve o áudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcreve o áudio": {
+      "main": [
+        [
+          {
+            "node": "Guarda a menssagem transcrita",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guarda a menssagem transcrita": {
+      "main": [
+        [
+          {
+            "node": "Agente IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guarda  a menssagem de texto": {
+      "main": [
+        [
+          {
+            "node": "Agente IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente IA",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recebe mensagem Telegram": {
+      "main": [
+        [
+          {
+            "node": "Identifica se é texto ou áudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Banco de dados": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente IA",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente IA": {
+      "main": [
+        [
+          {
+            "node": "Responde a mensagem Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "06b4b5c5-0d55-4859-9910-e80111684c0f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a9bab65190281dfa3d4e81a480c8d65726fbcd696115c3874e9b6eb113bed388"
+  },
+  "nodeGroups": [],
+  "id": "kDLPEAe9rkKM4Z2q",
+  "tags": []
+}
