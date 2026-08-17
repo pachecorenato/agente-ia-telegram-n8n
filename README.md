@@ -3,6 +3,8 @@
 ## Visão Geral
 Este projeto consiste em um fluxo de automação desenvolvido na plataforma n8n. O sistema atua como um assistente virtual operando via Telegram para uma loja de eletrônicos fictícia. Utilizando Inteligência Artificial, o bot é capaz de interagir com clientes, processar mensagens de voz, recomendar produtos de um catálogo predefinido e responder a dúvidas logísticas e financeiras.
 
+![Imagem do fluxo de automação no n8n](print_workflow.jpg)
+
 ## Arquitetura do Sistema
 O fluxo foi estruturado para garantir escalabilidade e tratamento eficiente de diferentes formatos de entrada de dados.
 
