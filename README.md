@@ -7,7 +7,7 @@ Este projeto consiste em um fluxo de automação desenvolvido na plataforma n8n.
 
 ### Testes de Estabilidade e Execução
 *(Monitoramento de logs, sucesso nas requisições do Telegram)*
-![Tela de Execuções Verdes](COLE_AQUI_O_LINK_DA_IMAGEM_3.jpg)
+![Tela de Execuções Verdes](telegram_teste.png)
 
 ## Arquitetura do Sistema
 O fluxo foi estruturado para garantir escalabilidade e tratamento eficiente de diferentes formatos de entrada de dados.
