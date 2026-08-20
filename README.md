@@ -5,6 +5,10 @@ Este projeto consiste em um fluxo de automação desenvolvido na plataforma n8n.
 
 ![Imagem do fluxo de automação no n8n](print_workflow.jpg)
 
+### Testes de Estabilidade e Execução
+*(Monitoramento de logs, sucesso nas requisições do Telegram)*
+![Tela de Execuções Verdes](COLE_AQUI_O_LINK_DA_IMAGEM_3.jpg)
+
 ## Arquitetura do Sistema
 O fluxo foi estruturado para garantir escalabilidade e tratamento eficiente de diferentes formatos de entrada de dados.
 
@@ -27,3 +31,6 @@ O fluxo foi estruturado para garantir escalabilidade e tratamento eficiente de d
 * **Suporte Omnichannel Básico:** Capacidade de interpretar comandos de voz com a mesma precisão de comandos em texto.
 * **Prevenção de Alucinação:** Instruções de sistema configuradas para restringir a atuação da IA ao catálogo fornecido, evitando a invenção de produtos ou promessas irreais.
 * **Tratamento de Quedas de API:** O nó do modelo de linguagem está configurado com a diretriz "Retry On Fail". Em caso de limitação de taxa (Rate Limit) ou sobrecarga temporária dos servidores do Google, o sistema aguarda um intervalo de tempo e repete a requisição de forma invisível para o usuário final, evitando o encerramento prematuro do fluxo.
+
+**Conecte-se comigo:**
+[LinkedIn](https://www.linkedin.com/in/pacheco-renato/)
